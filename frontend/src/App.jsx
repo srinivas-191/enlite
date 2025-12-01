@@ -20,13 +20,14 @@ const App = () => {
       {/* Routes */}
       <Suspense fallback={<h1 className="text-center text-emerald-600 py-10">Loading...</h1>}>
         <Routes>
-          <Route path="/" element={<Navigate to="/home" />} />
-          <Route path="/home" element={<HomePage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/predict" element={<PredictPage />} /> 
-          <Route path="/solutions" element={<Solutions/>}/>
-          <Route path="/contact" element={<ContactPage />} />
-        </Routes>
+  <Route path="/" element={<HomePage />} />
+  <Route path="/home" element={<HomePage />} />
+  <Route path="/about" element={<AboutPage />} />
+  <Route path="/predict" element={<PredictPage />} />
+  <Route path="/solutions" element={<Solutions />} />
+  <Route path="/contact" element={<ContactPage />} />
+</Routes>
+
       </Suspense>
 
       {/* Footer */}
