@@ -679,8 +679,8 @@ export default function PredictPage() {
     return (
       <div className="bg-white p-6 rounded-lg shadow">
         <h3 className="text-xl font-bold mb-4">Confirm values before predicting</h3>
-
-        <table className="w-full border-collapse">
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
           <thead>
             <tr className="bg-gray-100">
               <th className="border px-3 py-2 text-left">Field</th>
@@ -739,7 +739,7 @@ export default function PredictPage() {
 
                   <td className="border px-3 py-2 text-center">
                     {editValues[key] !== undefined ? (
-                      <div className="flex justify-center gap-2">
+                      <div className="flex flex-wrap justify-center gap-2">
                         <button onClick={() => handleSave(key)} className="px-3 py-1 bg-green-600 text-white rounded">
                           Save
                         </button>
@@ -747,6 +747,7 @@ export default function PredictPage() {
                           Undo
                         </button>
                       </div>
+
                     ) : (
                       <button onClick={() => handleEdit(key)} className="px-3 py-1 bg-blue-600 text-white rounded">
                         Edit
@@ -758,6 +759,8 @@ export default function PredictPage() {
             })}
           </tbody>
         </table>
+        </div>
+        
 
         <div className="flex gap-3 mt-6">
           <button onClick={goBack} className="px-4 py-2 border rounded">
