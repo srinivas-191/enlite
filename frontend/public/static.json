@@ -1,5 +1,7 @@
 {
-  "routes": [
-    { "src": "/.*", "dest": "/index.html" }
-  ]
+  "root": "index.html",
+  "clean_urls": true,
+  "routes": {
+    "/**": "index.html"
+  }
 }
