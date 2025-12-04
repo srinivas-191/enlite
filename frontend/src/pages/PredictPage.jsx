@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import html2pdf from "html2pdf.js";
+import PredictHeroFull from "../components/PredictHeroFull";
 
 const API_BASE = "https://genuine-enchantment-production-992b.up.railway.app/api";
 
@@ -161,6 +162,16 @@ export default function PredictPage() {
       sessionStorage.removeItem(STORAGE_KEY);
     }
   }, [step, form, result, loading]);
+
+  useEffect(() => {
+  setTimeout(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }, 50);
+}, [step]);
+
 
   // Normalize defaults -> editable strings (allow intermediate edit)
   function normalizeFormForEdit(obj) {
@@ -679,8 +690,8 @@ export default function PredictPage() {
     return (
       <div className="bg-white p-6 rounded-lg shadow">
         <h3 className="text-xl font-bold mb-4">Confirm values before predicting</h3>
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
+
+        <table className="w-full border-collapse">
           <thead>
             <tr className="bg-gray-100">
               <th className="border px-3 py-2 text-left">Field</th>
@@ -739,7 +750,7 @@ export default function PredictPage() {
 
                   <td className="border px-3 py-2 text-center">
                     {editValues[key] !== undefined ? (
-                      <div className="flex flex-wrap justify-center gap-2">
+                      <div className="flex justify-center gap-2">
                         <button onClick={() => handleSave(key)} className="px-3 py-1 bg-green-600 text-white rounded">
                           Save
                         </button>
@@ -747,7 +758,6 @@ export default function PredictPage() {
                           Undo
                         </button>
                       </div>
-
                     ) : (
                       <button onClick={() => handleEdit(key)} className="px-3 py-1 bg-blue-600 text-white rounded">
                         Edit
@@ -759,8 +769,6 @@ export default function PredictPage() {
             })}
           </tbody>
         </table>
-        </div>
-        
 
         <div className="flex gap-3 mt-6">
           <button onClick={goBack} className="px-4 py-2 border rounded">
@@ -777,284 +785,284 @@ export default function PredictPage() {
   };
 
   // MAIN RENDER
+  // Split-screen layout: left = form, right = <PredictHeroFull /> (always visible per user request)
   return (
-    <div ref={formRef} className="min-h-screen bg-[#fcf5ee] flex items-center justify-center px-4">
-      <div className="max-w-4xl w-full bg-blue-50 my-28 p-8 rounded-lg shadow">
-        <h1 className="text-2xl font-bold mb-4 text-center">Energy Efficiency — Predict</h1>
+    <div
+  ref={formRef}
+  className="min-h-screen bg-[#fcf5ee] flex justify-center items-start px-4 pt-28 pb-10"
+>
 
-        {step === 0 && (
-          <div className="text-center">
-            <p className="mb-6">Click Start to start entering building information (defaults prefilled).</p>
-            <button onClick={startFlow} className="bg-blue-600 text-white px-6 py-3 rounded">
-              Start
-            </button>
-          </div>
-        )}
+      <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+        {/* LEFT: Form / Content */}
+        <div className="w-full my-auto">
+          <div className="bg-blue-50 p-6 rounded-lg shadow w-full">
+            <h1 className="text-2xl font-bold mb-4 text-center">Energy Efficiency — Predict</h1>
 
-        {step === 1 && (
-          <div className="space-y-4 dropdown-wrapper">
-            <label className="block font-semibold">Building Type</label>
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => {
-                  setOpen((o) => !o);
-                }}
-                className="w-full p-2 border rounded flex justify-between items-center"
-              >
-                {form.Building_Type || "Select building type"}
-                <span>▼</span>
-              </button>
-              {open && (
-                <div className="mt-1 border rounded shadow bg-white max-h-40 overflow-y-auto z-50 relative">
-                  {buildingTypes.map((t, i) => (
-                    <div
-                      key={i}
-                      onClick={() => {
-                        setField("Building_Type", t);
-                        setOpen(false);
-                        setError("");
-                      }}
-                      className="p-2 hover:bg-gray-100 cursor-pointer"
-                    >
-                      {t}
+            {step === 0 && (
+              <div className="text-center">
+                <p className="mb-6">Click Start to start entering building information (defaults prefilled).</p>
+                <button onClick={startFlow} className="bg-blue-600 text-white px-6 py-3 rounded">
+                  Start
+                </button>
+              </div>
+            )}
+
+            {step === 1 && (
+              <div className="space-y-4 dropdown-wrapper">
+                <label className="block font-semibold">Building Type</label>
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpen((o) => !o);
+                    }}
+                    className="w-full p-2 border rounded flex justify-between items-center"
+                  >
+                    {form.Building_Type || "Select building type"}
+                    <span>▼</span>
+                  </button>
+                  {open && (
+                    <div className="mt-1 border rounded shadow bg-white max-h-40 overflow-y-auto z-50 relative">
+                      {buildingTypes.map((t, i) => (
+                        <div
+                          key={i}
+                          onClick={() => {
+                            setField("Building_Type", t);
+                            setOpen(false);
+                            setError("");
+                          }}
+                          className="p-2 hover:bg-gray-100 cursor-pointer"
+                        >
+                          {t}
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  )}
                 </div>
-              )}
-            </div>
-            <div className="flex gap-3">
-              <button type="button" onClick={() => setStep(0)} className="px-4 py-2 rounded border">
-                Cancel
-              </button>
-              <button type="button" onClick={goNext} className="bg-green-600 text-white px-4 py-2 rounded">
-                Next
-              </button>
-            </div>
-            {error && <div className="text-red-600">{error}</div>}
-          </div>
-        )}
+                <div className="flex gap-3 mt-3">
+                  <button type="button" onClick={() => setStep(0)} className="px-4 py-2 rounded border">
+                    Cancel
+                  </button>
+                  <button type="button" onClick={goNext} className="bg-green-600 text-white px-4 py-2 rounded">
+                    Next
+                  </button>
+                </div>
+                {error && <div className="text-red-600">{error}</div>}
+              </div>
+            )}
 
-        {step === 2 && (
-          <form
-            className="
-              bg-white/70
-              backdrop-blur
-              p-8
-              rounded-2xl
-              shadow-lg
-              mt-10
-              mb-10
-              border
-              border-gray-200
-              max-w-3xl
-              mx-auto
-              animate-fadeIn
-            "
-          >
-            <h3 className="text-xl font-semibold mb-6 text-gray-800">Envelope Properties</h3>
-
-            <div className="space-y-5">{envelopeFields.map((f) => fieldRow(f.replace(/_/g, " "), f, 2, "text", "0.01"))}</div>
-
-            <div className="flex gap-3 mt-8">
-              <button type="button" onClick={goBack} className="px-5 py-2 rounded-lg border hover:bg-gray-100 transition">
-                Back
-              </button>
-
-              <button
-                type="button"
-                onClick={goNext}
-                className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition shadow-sm"
+            {step === 2 && (
+              <form
+                className="
+                  bg-white/70
+                  backdrop-blur
+                  p-8
+                  rounded-2xl
+                  shadow-lg
+                  mt-6
+                  mb-6
+                  border
+                  border-gray-200
+                  animate-fadeIn
+                "
               >
-                Next
-              </button>
-            </div>
-          </form>
-        )}
+                <h3 className="text-xl font-semibold mb-6 text-gray-800">Envelope Properties</h3>
 
-        {step === 3 && (
-          <div>
-            <h3 className="text-lg font-semibold mb-3">Heat, Ventilation & AC</h3>
-            {hvacFields.map((f) => fieldRow(f.replace(/_/g, " "), f, 3, "text", "0.01"))}
-            <div className="flex gap-3 mt-4">
-              <button onClick={goBack} className="px-4 py-2 rounded border">
-                Back
-              </button>
-              <button onClick={goNext} className="bg-green-600 text-white px-4 py-2 rounded">
-                Next
-              </button>
-            </div>
-          </div>
-        )}
+                <div className="space-y-5">{envelopeFields.map((f) => fieldRow(f.replace(/_/g, " "), f, 2, "text", "0.01"))}</div>
 
-        {step === 4 && (
-          <div>
-            <h3 className="text-lg font-semibold mb-3">Internal Loads</h3>
-            {internalFields.map((f) => fieldRow(f.replace(/_/g, " "), f, 4, "text", "0.01"))}
-            <div className="flex gap-3 mt-4">
-              <button onClick={goBack} className="px-4 py-2 rounded border">
-                Back
-              </button>
-              <button onClick={goNext} className="bg-green-600 text-white px-4 py-2 rounded">
-                Next
-              </button>
-            </div>
-          </div>
-        )}
+                <div className="flex gap-3 mt-8">
+                  <button type="button" onClick={goBack} className="px-5 py-2 rounded-lg border hover:bg-gray-100 transition">
+                    Back
+                  </button>
 
-        {step === 5 && (
-          <div>
-            <h3 className="text-lg font-semibold mb-3">Building Geometry</h3>
-            {geometryFields.map((f) => fieldRow(f.replace(/_/g, " "), f, 5, "text", "0.01"))}
-            <div className="flex gap-3 mt-4">
-              <button onClick={goBack} className="px-4 py-2 rounded border">
-                Back
-              </button>
-              <button onClick={() => setStep(6)} className="bg-blue-600 text-white px-4 py-2 rounded">
-                Review & Confirm
-              </button>
-            </div>
-          </div>
-        )}
+                  <button
+                    type="button"
+                    onClick={goNext}
+                    className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition shadow-sm"
+                  >
+                    Next
+                  </button>
+                </div>
+              </form>
+            )}
 
-        {step === 6 && <SummaryCard />}
-
-{/* Step 7: Results */}
-        {step === 7 && result && (
-          <div className="mt-6 p-6 bg-white rounded-lg shadow space-y-6">
-
-            {/* HIDE THE PRINTABLE VERSION from normal view, but keep it in the DOM */}
-            <div style={{ position: 'absolute', left: '-9999px', top: '0', width: '100%', height: '100%' }}>
-              <PrintableReport />
-            </div>
-
-            {/* Title, Performance Category, and GIF section here... */}
-            {/* Title */}
-            <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-              Results
-              {/* Efficiency Icon */}
-              <span>
-                {result.performance_category === "Excellent" && "🌟"}
-                {result.performance_category === "Moderate" && "⚡"}
-                {result.performance_category === "Poor" && "🔥"}
-              </span>
-            </h2>
-
-            {/* Performance Category with GIF/Animation */}
-            <div className="flex items-center gap-3 mt-2">
-              <p className={`font-bold px-3 py-1 rounded inline-block ${
-                result.performance_category === "Excellent" ? "bg-green-100 text-green-800" :
-                  result.performance_category === "Moderate" ? "bg-yellow-100 text-yellow-800" :
-                    "bg-red-100 text-red-800"
-                }`}>
-                {result.performance_category}
-              </p>
-              <img
-                src={
-                  result.performance_category === "Excellent" ? "/assets/excellent.gif" :
-                    result.performance_category === "Moderate" ? "/assets/moderate.gif" :
-                      "/assets/poor.gif"
-                }
-                alt="Performance Icon"
-                className="w-20 h-30"
-              />
-            </div>
-
-            {/* 🟢 Energy Metrics Bars (FINAL FIX for Color Differentiation) */}
-            <div className="mt-4 space-y-3">
-              <h3 className="font-semibold text-gray-700">Energy Metrics</h3>
-
-              {["Total Energy", "Monthly EUI"].map((label, idx) => {
-                const value = label === "Total Energy" ? result.total_energy_month_kwh : result.eui_month_kwh_m2;
-                const color = label === "Total Energy" ? "blue" : "green";
-                // ✅ FIX: Increased max from 1000 to 3000 to accommodate predicted values (e.g., 2667.06)
-                const max = label === "Total Energy" ? 3000 : 50; 
-                
-                // Define explicit hex colors for the blue/green shades (Tailwind equivalent)
-                const colorMap = {
-                    // blue-200 (light background) and blue-600 (dark progress)
-                    blue: { bg: '#bfdbfe', progress: '#2563eb' }, 
-                    // green-200 (light background) and green-600 (dark progress)
-                    green: { bg: '#dcfce7', progress: '#16a34a' } 
-                };
-                const colorConfig = colorMap[color]; 
-
-                return (
-                  <div key={idx} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
-                    <span className="w-32">{label}:</span>
-                    
-                    {/* Background container (light color) */}
-                    <div 
-                        // Set background color inline to ensure it renders correctly
-                        className={`h-4 rounded flex-1 overflow-hidden`} 
-                        style={{ backgroundColor: colorConfig.bg }}
-                    >
-                      {/* Progress bar (dark color) */}
-                      <div
-                        className={`h-4 rounded transition-all duration-500`}
-                        style={{ 
-                            // Bar width will now be calculated relative to the new max (e.g., 2667/3000 ≈ 88%)
-                            width: `${Math.min(value / max * 100, 100)}%`,
-                            backgroundColor: colorConfig.progress 
-                        }}
-                      />
-                    </div>
-                    <span>{value}{label === "Total Energy" ? " kWh" : " kWh/m²"}</span>
-                  </div>
-                )
-              })}
-            </div>
-
-            {/* Impacting Factors with Color Dots */}
-            <div className="mt-4">
-              <h3 className="font-semibold text-gray-700 mb-2">Impacting Factors</h3>
-              <div className="flex flex-wrap gap-3">
-                {result.impacting_factors?.length ? result.impacting_factors.map((f, i) => {
-                  // Determine color based on keywords
-                  const impactColor = f.toLowerCase().includes("high") ? "bg-red-500" :
-                    f.toLowerCase().includes("medium") ? "bg-yellow-400" :
-                      "bg-green-500";
-                  return (
-                    <div key={i} className="flex items-center gap-2 p-2 border rounded hover:shadow-lg transition cursor-pointer">
-                      <span className={`w-3 h-3 rounded-full ${impactColor}`} />
-                      <span>{f}</span>
-                    </div>
-                  );
-                }) : <div className="text-green-700">No major issues found — building appears efficient.</div>}
+            {step === 3 && (
+              <div className="mt-4">
+                <h3 className="text-lg font-semibold mb-3">Heat, Ventilation & AC</h3>
+                {hvacFields.map((f) => fieldRow(f.replace(/_/g, " "), f, 3, "text", "0.01"))}
+                <div className="flex gap-3 mt-4">
+                  <button onClick={goBack} className="px-4 py-2 rounded border">
+                    Back
+                  </button>
+                  <button onClick={goNext} className="bg-green-600 text-white px-4 py-2 rounded">
+                    Next
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
 
-            {/* Recommendations */}
-            <div className="mt-4">
-              <h3 className="font-semibold text-gray-700 mb-2">Recommendations</h3>
-              <div className="flex flex-wrap gap-3">
-                {result.recommendations?.length ? result.recommendations.map((r, i) => (
-                  <div key={i} className="flex items-center gap-2 p-2 border rounded hover:bg-blue-50 transition cursor-pointer">
-                    <span className="text-blue-500">💡</span>
-                    <span>{r}</span>
-                  </div>
-                )) : <div className="text-green-700">No improvements recommended. Excellent performance.</div>}
+            {step === 4 && (
+              <div className="mt-4">
+                <h3 className="text-lg font-semibold mb-3">Internal Loads</h3>
+                {internalFields.map((f) => fieldRow(f.replace(/_/g, " "), f, 4, "text", "0.01"))}
+                <div className="flex gap-3 mt-4">
+                  <button onClick={goBack} className="px-4 py-2 rounded border">
+                    Back
+                  </button>
+                  <button onClick={goNext} className="bg-green-600 text-white px-4 py-2 rounded">
+                    Next
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
 
-            {/* Action Buttons (Updated with Download button) */}
-            <div className="mt-6 flex flex-wrap gap-3">
-              <button onClick={handleDownload} className="px-4 py-2 border rounded bg-blue-600 text-white hover:bg-blue-700 transition flex items-center gap-1">
-                ⬇️ Download Report (PDF)
-              </button>
-              <button onClick={onPredictAgainSame} className="px-4 py-2 border rounded bg-green-200 hover:bg-gray-100 transition flex items-center gap-1">
-                🔄 Predict Again (Same)
-              </button>
-              <button onClick={onPredictAgainDifferent} className="px-4 py-2 border rounded hover:bg-gray-100 transition flex items-center gap-1">
-                🔄 New
-              </button>
-              <button onClick={onExit} className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition flex items-center gap-1">
-                ❌ Exit
-              </button>
-            </div>
+            {step === 5 && (
+              <div className="mt-4">
+                <h3 className="text-lg font-semibold mb-3">Building Geometry</h3>
+                {geometryFields.map((f) => fieldRow(f.replace(/_/g, " "), f, 5, "text", "0.01"))}
+                <div className="flex gap-3 mt-4">
+                  <button onClick={goBack} className="px-4 py-2 rounded border">
+                    Back
+                  </button>
+                  <button onClick={() => setStep(6)} className="bg-blue-600 text-white px-4 py-2 rounded">
+                    Review & Confirm
+                  </button>
+                </div>
+              </div>
+            )}
 
+            {step === 6 && <SummaryCard />}
+
+            {/* Step 7: Results */}
+            {step === 7 && result && (
+              <div className="mt-6 p-6 bg-white rounded-lg shadow space-y-6">
+
+                {/* HIDE THE PRINTABLE VERSION from normal view, but keep it in the DOM */}
+                <div style={{ position: 'absolute', left: '-9999px', top: '0', width: '100%', height: '100%' }}>
+                  <PrintableReport />
+                </div>
+
+                {/* Title, Performance Category, and GIF section here... */}
+                <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                  Results
+                  <span>
+                    {result.performance_category === "Excellent" && "🌟"}
+                    {result.performance_category === "Moderate" && "⚡"}
+                    {result.performance_category === "Poor" && "🔥"}
+                  </span>
+                </h2>
+
+                <div className="flex items-center gap-3 mt-2">
+                  <p className={`font-bold px-3 py-1 rounded inline-block ${
+                    result.performance_category === "Excellent" ? "bg-green-100 text-green-800" :
+                      result.performance_category === "Moderate" ? "bg-yellow-100 text-yellow-800" :
+                        "bg-red-100 text-red-800"
+                    }`}>
+                    {result.performance_category}
+                  </p>
+                  <img
+                    src={
+                      result.performance_category === "Excellent" ? "/assets/excellent.gif" :
+                        result.performance_category === "Moderate" ? "/assets/moderate.gif" :
+                          "/assets/poor.gif"
+                    }
+                    alt="Performance Icon"
+                    className="w-20 h-30"
+                  />
+                </div>
+
+                {/* Energy Metrics */}
+                <div className="mt-4 space-y-3">
+                  <h3 className="font-semibold text-gray-700">Energy Metrics</h3>
+
+                  {["Total Energy", "Monthly EUI"].map((label, idx) => {
+                    const value = label === "Total Energy" ? result.total_energy_month_kwh : result.eui_month_kwh_m2;
+                    const color = label === "Total Energy" ? "blue" : "green";
+                    const max = label === "Total Energy" ? 3000 : 50;
+                    const colorMap = {
+                      blue: { bg: '#bfdbfe', progress: '#2563eb' },
+                      green: { bg: '#dcfce7', progress: '#16a34a' }
+                    };
+                    const colorConfig = colorMap[color];
+
+                    return (
+                      <div key={idx} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                        <span className="w-32">{label}:</span>
+
+                        <div className={`h-4 rounded flex-1 overflow-hidden`} style={{ backgroundColor: colorConfig.bg }}>
+                          <div
+                            className={`h-4 rounded transition-all duration-500`}
+                            style={{
+                              width: `${Math.min(value / max * 100, 100)}%`,
+                              backgroundColor: colorConfig.progress
+                            }}
+                          />
+                        </div>
+                        <span>{value}{label === "Total Energy" ? " kWh" : " kWh/m²"}</span>
+                      </div>
+                    )
+                  })}
+                </div>
+
+                {/* Impacting Factors */}
+                <div className="mt-4">
+                  <h3 className="font-semibold text-gray-700 mb-2">Impacting Factors</h3>
+                  <div className="flex flex-wrap gap-3">
+                    {result.impacting_factors?.length ? result.impacting_factors.map((f, i) => {
+                      const impactColor = f.toLowerCase().includes("high") ? "bg-red-500" :
+                        f.toLowerCase().includes("medium") ? "bg-yellow-400" :
+                          "bg-green-500";
+                      return (
+                        <div key={i} className="flex items-center gap-2 p-2 border rounded hover:shadow-lg transition cursor-pointer">
+                          <span className={`w-3 h-3 rounded-full ${impactColor}`} />
+                          <span>{f}</span>
+                        </div>
+                      );
+                    }) : <div className="text-green-700">No major issues found — building appears efficient.</div>}
+                  </div>
+                </div>
+
+                {/* Recommendations */}
+                <div className="mt-4">
+                  <h3 className="font-semibold text-gray-700 mb-2">Recommendations</h3>
+                  <div className="flex flex-wrap gap-3">
+                    {result.recommendations?.length ? result.recommendations.map((r, i) => (
+                      <div key={i} className="flex items-center gap-2 p-2 border rounded hover:bg-blue-50 transition cursor-pointer">
+                        <span className="text-blue-500">💡</span>
+                        <span>{r}</span>
+                      </div>
+                    )) : <div className="text-green-700">No improvements recommended. Excellent performance.</div>}
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <button onClick={handleDownload} className="px-4 py-2 border rounded bg-blue-600 text-white hover:bg-blue-700 transition flex items-center gap-1">
+                    ⬇️ Download Report (PDF)
+                  </button>
+                  <button onClick={onPredictAgainSame} className="px-4 py-2 border rounded bg-green-200 hover:bg-gray-100 transition flex items-center gap-1">
+                    🔄 Predict Again (Same)
+                  </button>
+                  <button onClick={onPredictAgainDifferent} className="px-4 py-2 border rounded hover:bg-gray-100 transition flex items-center gap-1">
+                    🔄 New
+                  </button>
+                  <button onClick={onExit} className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition flex items-center gap-1">
+                    ❌ Exit
+                  </button>
+                </div>
+
+              </div>
+            )}
+            {sessionEnded && <div className="mt-4 text-gray-600">Session ended.</div>}
           </div>
-        )}        {sessionEnded && <div className="mt-4 text-gray-600">Session ended.</div>}
+        </div>
+
+        {/* RIGHT: PredictHeroFull (animation / video) - always visible on large screens */}
+        <div className="w-full flex justify-center">
+          <div className="w-full">
+            <PredictHeroFull />
+          </div>
+        </div>
       </div>
     </div>
   );
