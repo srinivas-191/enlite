@@ -166,7 +166,7 @@ const Navbar = () => {
 
           onClick={() => setIsOpen(false)}
         >
-          Solutions
+          Our AI
         </NavLink>
       </li>
 
