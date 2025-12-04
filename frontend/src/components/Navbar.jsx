@@ -80,7 +80,7 @@ const Navbar = () => {
                 `
               }
             >
-              Solutions
+              Our AI
             </NavLink>
           </li>
 

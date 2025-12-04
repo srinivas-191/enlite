@@ -690,13 +690,13 @@ export default function PredictPage() {
     return (
       <div className="bg-white p-6 rounded-lg shadow">
         <h3 className="text-xl font-bold mb-4">Confirm values before predicting</h3>
-
-        <table className="w-full border-collapse">
+        <div className="overflow-x-auto">
+        <table className="w-full border-collapse min-w-max">
           <thead>
             <tr className="bg-gray-100">
-              <th className="border px-3 py-2 text-left">Field</th>
-              <th className="border px-3 py-2 text-left">Value</th>
-              <th className="border px-3 py-2 text-center">Actions</th>
+              <th className="border px-3 py-2 text-left" style={{ width: '40%' }}>Field</th>
+              <th className="border px-3 py-2 text-left" style={{ width: '40%' }}>Value</th>
+              <th className="border px-3 py-2 text-center" style={{ width: '20%' }}>Actions</th>
             </tr>
           </thead>
 
@@ -769,7 +769,7 @@ export default function PredictPage() {
             })}
           </tbody>
         </table>
-
+        </div>
         <div className="flex gap-3 mt-6">
           <button onClick={goBack} className="px-4 py-2 border rounded">
             Back
