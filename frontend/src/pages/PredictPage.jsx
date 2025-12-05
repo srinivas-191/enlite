@@ -4,7 +4,7 @@ import axios from "axios";
 import html2pdf from "html2pdf.js";
 import PredictHeroFull from "../components/PredictHeroFull";
 
-const API_BASE = "https://genuine-enchantment-production-992b.up.railway.app/api";
+const API_BASE = "https://enlite-production.up.railway.app/api";
 
 const SECTION_ORDER = [
   "Building_Type",
