@@ -34,6 +34,21 @@ FEATURE_RANGES = {
     "Total_Building_Area": (85.91, 10000),
 }
 
+DEFAULT_VALUES = {
+    "Floor_Insulation": (0.88),
+    "Door_Insulation": (3.25),
+    "Roof_Insulation": (1.17),
+    "Window_Insulation": (3.24),
+    "Wall_Insulation": (1.25),
+    "Hvac_Efficiency": (3.25),
+    "Domestic_Hot_Water_Usage": (2),
+    "Lighting_Density": (5),
+    "Occupancy_Level": (3),
+    "Equipment_Density": (11),
+    "Window_To_Wall_Ratio": (35),
+    "Total_Building_Area": (85.91),
+}
+
 # ------------------------------------------------------------
 # Clean model loader
 # ------------------------------------------------------------
@@ -146,18 +161,32 @@ def get_building_types(request):
 
 @api_view(["GET"])
 def get_defaults(request):
+    """
+    Returns the list of features, their ranges, and default values
+    from the static DEFAULT_VALUES dictionary.
+    """
     try:
+        # Load features list from the scaler/model, if possible
         _, _, _, features = load_all()
     except:
-        features = list(FEATURE_RANGES.keys())
+        # Fallback to keys of the default values dictionary
+        features = list(DEFAULT_VALUES.keys())
 
-    defaults = {f: FEATURE_RANGES[f][0] for f in features if f in FEATURE_RANGES}
+    defaults = {}
+    for feat in features:
+        if feat in DEFAULT_VALUES:
+            # CORRECTED: Assign the specific default value for the feature 'feat'
+            defaults[feat] = DEFAULT_VALUES[feat]
+            
+    # NOTE: The feature_ranges key in the response should use FEATURE_RANGES, 
+    # not DEFAULT_VALUES, unless the intent is to replace ranges with single values.
+    # Assuming FEATURE_RANGES should be used for the ranges:
+
     return Response({
         "features": features,
-        "feature_ranges": FEATURE_RANGES,
+        "feature_ranges": FEATURE_RANGES, # Using FEATURE_RANGES for min/max
         "defaults": defaults,
     })
-
 @api_view(["POST"])
 def predict_energy(request):
     try:

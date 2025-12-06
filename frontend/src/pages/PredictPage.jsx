@@ -4,7 +4,9 @@ import axios from "axios";
 import html2pdf from "html2pdf.js";
 import PredictHeroFull from "../components/PredictHeroFull";
 
-const API_BASE = "https://enlite-production.up.railway.app/api";
+//https://enlite-production.up.railway.app/api
+
+const API_BASE = "http://127.0.0.1:8000/api";
 
 const SECTION_ORDER = [
   "Building_Type",
@@ -518,10 +520,11 @@ export default function PredictPage() {
             </thead>
             <tbody>
               {Object.keys(form).map((key, index) => {
+                const displayLabel = key === "Domestic_Hot_Water_Usage" ? "Daily Hot Water Usage" : key.replace(/_/g, " ");
                 return (
                   <tr key={key} style={{ backgroundColor: index % 2 === 0 ? "#f9f9f9" : "#ffffff" }}>
                     <td style={{ border: "1px solid #e5e7eb", padding: "7px 8px", textTransform: "capitalize", fontWeight: "500", verticalAlign: "middle", width: hasRanges ? "35%" : "50%" }}>
-                      {key.replace(/_/g, " ")}
+                      {displayLabel}
                       {getUnit(key) && <span> ({getUnit(key)})</span>}
                     </td>
                     <td style={{ border: "1px solid #e5e7eb", padding: "5px 8px", verticalAlign: "middle", textAlign: "center", width: hasRanges ? "30%" : "50%" }}>
@@ -703,10 +706,11 @@ export default function PredictPage() {
           <tbody>
             {Object.keys(form).map((key) => {
               const unit = getUnit(key);
+              const displayLabel = key === "Domestic_Hot_Water_Usage" ? "Daily Hot Water Usage" : key.replace(/_/g, " "); // <-- **THE CHANGE IS HERE**
               return (
                 <tr key={key}>
                   <td className="border px-3 py-2 capitalize">
-                    {key.replace(/_/g, " ")}
+                    {displayLabel}
                     {unit && <span className="text-gray-500"> ({unit})</span>}
                   </td>
 
@@ -904,7 +908,13 @@ export default function PredictPage() {
             {step === 4 && (
               <div className="mt-4">
                 <h3 className="text-lg font-semibold mb-3">Internal Loads</h3>
-                {internalFields.map((f) => fieldRow(f.replace(/_/g, " "), f, 4, "text", "0.01"))}
+                {internalFields.map((f) => {
+                  let label = f.replace(/_/g, " ");
+                  if (f === "Domestic_Hot_Water_Usage") {
+                    label = "Daily Hot Water Usage"; // <-- **THE CHANGE IS HERE**
+                  }
+                  return fieldRow(label, f, 4, "text", "0.01");
+                })}
                 <div className="flex gap-3 mt-4">
                   <button onClick={goBack} className="px-4 py-2 rounded border">
                     Back
