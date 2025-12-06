@@ -4,16 +4,16 @@ import axios from "axios";
 import html2pdf from "html2pdf.js";
 import PredictHeroFull from "../components/PredictHeroFull";
 
-//https://enlite-production.up.railway.app/api
+//
 
-const API_BASE = "http://127.0.0.1:8000/api";
+const API_BASE = "https://enlite-production.up.railway.app/api";
 
 const SECTION_ORDER = [
   "Building_Type",
   "Envelope",
   "HVAC",
   "Internal_Loads",
-  "Geometry"
+  "Geometry",
 ];
 
 const envelopeFields = [
@@ -22,14 +22,14 @@ const envelopeFields = [
   "Floor_Insulation",
   "Window_Insulation",
   "Wall_Insulation",
-  "Window_To_Wall_Ratio"
+  "Window_To_Wall_Ratio",
 ];
 const hvacFields = ["Hvac_Efficiency"];
 const internalFields = [
   "Lighting_Density",
   "Occupancy_Level",
   "Equipment_Density",
-  "Domestic_Hot_Water_Usage"
+  "Domestic_Hot_Water_Usage",
 ];
 const geometryFields = ["Total_Building_Area"];
 
@@ -98,7 +98,7 @@ export default function PredictPage() {
     if (formRef.current) {
       formRef.current.scrollIntoView({
         behavior: "smooth",
-        block: "start"
+        block: "start",
       });
     }
   }, [step]);
@@ -140,7 +140,7 @@ export default function PredictPage() {
           Occupancy_Level: 1,
           Equipment_Density: 1,
           Window_To_Wall_Ratio: 0,
-          Total_Building_Area: 85.91
+          Total_Building_Area: 85.91,
         };
         setDefaults(fallback);
         if (!persistedState || persistedState.step === 0) {
@@ -166,14 +166,13 @@ export default function PredictPage() {
   }, [step, form, result, loading]);
 
   useEffect(() => {
-  setTimeout(() => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  }, 50);
-}, [step]);
-
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }, 50);
+  }, [step]);
 
   // Normalize defaults -> editable strings (allow intermediate edit)
   function normalizeFormForEdit(obj) {
@@ -219,7 +218,14 @@ export default function PredictPage() {
     const raw = form[key];
 
     // If empty or intermediate, set to min (if range) or 0, then format
-    if (raw === "" || raw === null || raw === undefined || raw === "-" || raw === "." || raw === "-.") {
+    if (
+      raw === "" ||
+      raw === null ||
+      raw === undefined ||
+      raw === "-" ||
+      raw === "." ||
+      raw === "-."
+    ) {
       if (ranges && ranges[key]) {
         setForm((prev) => ({ ...prev, [key]: fmt2(ranges[key][0]) }));
       } else {
@@ -231,7 +237,8 @@ export default function PredictPage() {
     // Try parse number
     const num = Number(raw);
     if (isNaN(num)) {
-      if (ranges && ranges[key]) setForm((prev) => ({ ...prev, [key]: fmt2(ranges[key][0]) }));
+      if (ranges && ranges[key])
+        setForm((prev) => ({ ...prev, [key]: fmt2(ranges[key][0]) }));
       else setForm((prev) => ({ ...prev, [key]: "0.00" }));
       return;
     }
@@ -244,11 +251,17 @@ export default function PredictPage() {
         clamped = min;
         // brief animation
         setRangeError((prev) => ({ ...prev, [key]: true }));
-        setTimeout(() => setRangeError((prev) => ({ ...prev, [key]: false })), 900);
+        setTimeout(
+          () => setRangeError((prev) => ({ ...prev, [key]: false })),
+          900
+        );
       } else if (num > max) {
         clamped = max;
         setRangeError((prev) => ({ ...prev, [key]: true }));
-        setTimeout(() => setRangeError((prev) => ({ ...prev, [key]: false })), 900);
+        setTimeout(
+          () => setRangeError((prev) => ({ ...prev, [key]: false })),
+          900
+        );
       }
       setForm((prev) => ({ ...prev, [key]: fmt2(clamped) }));
     } else {
@@ -266,7 +279,14 @@ export default function PredictPage() {
       const raw = payload[k];
 
       // If empty or intermediate, set to min or 0
-      if (raw === "" || raw === null || raw === undefined || raw === "-" || raw === "." || raw === "-.") {
+      if (
+        raw === "" ||
+        raw === null ||
+        raw === undefined ||
+        raw === "-" ||
+        raw === "." ||
+        raw === "-."
+      ) {
         payload[k] = ranges && ranges[k] ? ranges[k][0] : 0;
         return;
       }
@@ -305,7 +325,7 @@ export default function PredictPage() {
       filename: "Energy_Prediction_Report.pdf",
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: { scale: 3, logging: true, useCORS: true },
-      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
     };
 
     html2pdf().set(options).from(element).save();
@@ -358,7 +378,7 @@ export default function PredictPage() {
           Occupancy_Level: 1,
           Equipment_Density: 1,
           Window_To_Wall_Ratio: 0,
-          Total_Building_Area: 85.91
+          Total_Building_Area: 85.91,
         })
       );
     }
@@ -376,13 +396,22 @@ export default function PredictPage() {
         if (k === "Building_Type") return;
         // Simulate blur correction
         const raw = form[k];
-        if (raw === "" || raw === null || raw === undefined || raw === "-" || raw === "." || raw === "-.") {
-          if (ranges && ranges[k]) setForm((prev) => ({ ...prev, [k]: fmt2(ranges[k][0]) }));
+        if (
+          raw === "" ||
+          raw === null ||
+          raw === undefined ||
+          raw === "-" ||
+          raw === "." ||
+          raw === "-."
+        ) {
+          if (ranges && ranges[k])
+            setForm((prev) => ({ ...prev, [k]: fmt2(ranges[k][0]) }));
           else setForm((prev) => ({ ...prev, [k]: "0.00" }));
         } else {
           const num = Number(raw);
           if (isNaN(num)) {
-            if (ranges && ranges[k]) setForm((prev) => ({ ...prev, [k]: fmt2(ranges[k][0]) }));
+            if (ranges && ranges[k])
+              setForm((prev) => ({ ...prev, [k]: fmt2(ranges[k][0]) }));
             else setForm((prev) => ({ ...prev, [k]: "0.00" }));
           } else {
             if (ranges && ranges[k]) {
@@ -405,7 +434,10 @@ export default function PredictPage() {
       setStep(7);
     } catch (err) {
       console.error(err);
-      setError(err?.response?.data?.error || "Prediction failed. See console for details.");
+      setError(
+        err?.response?.data?.error ||
+          "Prediction failed. See console for details."
+      );
     } finally {
       setLoading(false);
     }
@@ -434,7 +466,8 @@ export default function PredictPage() {
 
   // FIELD ROW: uses text input so intermediate typing allowed
   const fieldRow = (label, key, stepNum, type = "text", stepValue = "0.01") => {
-    const value = form[key] !== undefined && form[key] !== null ? form[key] : "";
+    const value =
+      form[key] !== undefined && form[key] !== null ? form[key] : "";
     const unit = getUnit(key);
 
     return (
@@ -460,7 +493,11 @@ export default function PredictPage() {
           {ranges && ranges[key] && (
             <p
               className={`text-xs mt-1 transition-all duration-300
-                ${rangeError[key] ? "text-red-500 scale-110" : "text-gray-500 scale-100"}
+                ${
+                  rangeError[key]
+                    ? "text-red-500 scale-110"
+                    : "text-gray-500 scale-100"
+                }
               `}
             >
               Range: {ranges[key][0]} — {ranges[key][1]} {unit && unit}
@@ -485,8 +522,16 @@ export default function PredictPage() {
       }
 
       // If raw is empty or invalid, try ranges min
-      if (raw === "" || raw === null || raw === undefined || raw === "-" || raw === "." || raw === "-.") {
-        if (ranges && ranges[k]) return `${fmt2(ranges[k][0])}${unit ? " " + unit : ""}`;
+      if (
+        raw === "" ||
+        raw === null ||
+        raw === undefined ||
+        raw === "-" ||
+        raw === "." ||
+        raw === "-."
+      ) {
+        if (ranges && ranges[k])
+          return `${fmt2(ranges[k][0])}${unit ? " " + unit : ""}`;
         return `0.00${unit ? " " + unit : ""}`;
       }
 
@@ -501,38 +546,114 @@ export default function PredictPage() {
     };
 
     return (
-      <div id="pdf-content" className="p-2 bg-white border border-gray-300 rounded-lg shadow-xl w-full max-w-4xl mx-auto" style={{ fontSize: "11pt" }}>
-        <h1 className="text-xl font-bold text-center text-blue-700 mb-4 pb-2" style={{ fontSize: "16pt" }}>
+      <div
+        id="pdf-content"
+        className="p-2 bg-white border border-gray-300 rounded-lg shadow-xl w-full max-w-4xl mx-auto"
+        style={{ fontSize: "11pt" }}
+      >
+        <h1
+          className="text-xl font-bold text-center text-blue-700 mb-4 pb-2"
+          style={{ fontSize: "16pt" }}
+        >
           Energy Prediction Report
         </h1>
 
         <div className="mb-6">
-          <h2 className="text-lg font-semibold mb-3 text-gray-800 flex items-center gap-2" style={{ fontSize: "14pt" }}>
+          <h2
+            className="text-lg font-semibold mb-3 text-gray-800 flex items-center gap-2"
+            style={{ fontSize: "14pt" }}
+          >
             User Inputs (Prediction Parameters)
           </h2>
-          <table className="w-full border-collapse text-xs" style={{ fontSize: "10pt" }}>
+          <table
+            className="w-full border-collapse text-xs"
+            style={{ fontSize: "10pt" }}
+          >
             <thead>
               <tr className="bg-gray-100">
-                <th style={{ border: "1px solid #e5e7eb", padding: "5px 8px", textAlign: "center", verticalAlign: "middle" }}>Field</th>
-                <th style={{ border: "1px solid #e5e7eb", padding: "5px 8px", textAlign: "center", verticalAlign: "middle" }}>Value</th>
-                {hasRanges && <th style={{ border: "1px solid #e5e7eb", padding: "7px 8px", textAlign: "center", verticalAlign: "middle" }}>Range</th>}
+                <th
+                  style={{
+                    border: "1px solid #e5e7eb",
+                    padding: "5px 8px",
+                    textAlign: "center",
+                    verticalAlign: "middle",
+                  }}
+                >
+                  Field
+                </th>
+                <th
+                  style={{
+                    border: "1px solid #e5e7eb",
+                    padding: "5px 8px",
+                    textAlign: "center",
+                    verticalAlign: "middle",
+                  }}
+                >
+                  Value
+                </th>
+                {hasRanges && (
+                  <th
+                    style={{
+                      border: "1px solid #e5e7eb",
+                      padding: "7px 8px",
+                      textAlign: "center",
+                      verticalAlign: "middle",
+                    }}
+                  >
+                    Range
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody>
               {Object.keys(form).map((key, index) => {
-                const displayLabel = key === "Domestic_Hot_Water_Usage" ? "Daily Hot Water Usage" : key.replace(/_/g, " ");
+                const displayLabel =
+                  key === "Domestic_Hot_Water_Usage"
+                    ? "Daily Hot Water Usage"
+                    : key.replace(/_/g, " ");
                 return (
-                  <tr key={key} style={{ backgroundColor: index % 2 === 0 ? "#f9f9f9" : "#ffffff" }}>
-                    <td style={{ border: "1px solid #e5e7eb", padding: "7px 8px", textTransform: "capitalize", fontWeight: "500", verticalAlign: "middle", width: hasRanges ? "35%" : "50%" }}>
+                  <tr
+                    key={key}
+                    style={{
+                      backgroundColor: index % 2 === 0 ? "#f9f9f9" : "#ffffff",
+                    }}
+                  >
+                    <td
+                      style={{
+                        border: "1px solid #e5e7eb",
+                        padding: "7px 8px",
+                        textTransform: "capitalize",
+                        fontWeight: "500",
+                        verticalAlign: "middle",
+                        width: hasRanges ? "35%" : "50%",
+                      }}
+                    >
                       {displayLabel}
                       {getUnit(key) && <span> ({getUnit(key)})</span>}
                     </td>
-                    <td style={{ border: "1px solid #e5e7eb", padding: "5px 8px", verticalAlign: "middle", textAlign: "center", width: hasRanges ? "30%" : "50%" }}>
+                    <td
+                      style={{
+                        border: "1px solid #e5e7eb",
+                        padding: "5px 8px",
+                        verticalAlign: "middle",
+                        textAlign: "center",
+                        width: hasRanges ? "30%" : "50%",
+                      }}
+                    >
                       <span>{pdfValueWithUnit(key)}</span>
                     </td>
 
                     {hasRanges && (
-                      <td style={{ border: "1px solid #e5e7eb", padding: "5px 8px", color: "#6b7280", verticalAlign: "middle", textAlign: "center", width: "35%" }}>
+                      <td
+                        style={{
+                          border: "1px solid #e5e7eb",
+                          padding: "5px 8px",
+                          color: "#6b7280",
+                          verticalAlign: "middle",
+                          textAlign: "center",
+                          width: "35%",
+                        }}
+                      >
                         {pdfRangeWithUnit(key)}
                       </td>
                     )}
@@ -545,75 +666,236 @@ export default function PredictPage() {
 
         {result && (
           <div className="mt-6 pt-4 border-t border-gray-300">
-            <h2 className="text-lg font-semibold mb-3 text-gray-800 flex items-center gap-2" style={{ fontSize: "14pt" }}>
+            <h2
+              className="text-lg font-semibold mb-3 text-gray-800 flex items-center gap-2"
+              style={{ fontSize: "14pt" }}
+            >
               Prediction Results
             </h2>
 
             <div className="flex items-center gap-3 mb-3">
               <p className="font-bold text-sm">Performance Category:</p>
-              <span style={{
-                fontWeight: "bold", paddingTop: "0px", paddingBottom: "10px", paddingLeft: "3px", paddingRight: "3px",
-                borderRadius: "4px", display: "inline-block", fontSize: "10pt", textAlign: "center",
-                color: result.performance_category === "Excellent" ? "green" : result.performance_category === "Moderate" ? "orange" : "red",
-                border: "1px solid currentColor",
-                backgroundColor: result.performance_category === "Excellent" ? "#e6ffe6" : result.performance_category === "Moderate" ? "#fff5e6" : "#ffe6e6"
-              }}>
+              <span
+                style={{
+                  fontWeight: "bold",
+                  paddingTop: "0px",
+                  paddingBottom: "10px",
+                  paddingLeft: "3px",
+                  paddingRight: "3px",
+                  borderRadius: "4px",
+                  display: "inline-block",
+                  fontSize: "10pt",
+                  textAlign: "center",
+                  color:
+                    result.performance_category === "Excellent"
+                      ? "green"
+                      : result.performance_category === "Moderate"
+                      ? "orange"
+                      : "red",
+                  border: "1px solid currentColor",
+                  backgroundColor:
+                    result.performance_category === "Excellent"
+                      ? "#e6ffe6"
+                      : result.performance_category === "Moderate"
+                      ? "#fff5e6"
+                      : "#ffe6e6",
+                }}
+              >
                 {result.performance_category}
               </span>
             </div>
 
             <div className="mt-3 space-y-3">
-              <h3 className="font-semibold text-base text-gray-800 mb-2" style={{ fontSize: "12pt" }}>Energy Metrics</h3>
+              <h3
+                className="font-semibold text-base text-gray-800 mb-2"
+                style={{ fontSize: "12pt" }}
+              >
+                Energy Metrics
+              </h3>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <span style={{ width: "100px", fontWeight: "bold", fontSize: "10pt" }}>Total Energy:</span>
-                  <div style={{ flexGrow: 1, backgroundColor: "#e0f2ff", height: "18px", borderRadius: "4px", overflow: "hidden", minWidth: "100px" }}>
-                    <div style={{ height: "100%", width: `${Math.min(result.total_energy_month_kwh / 3000 * 100, 100)}%`, backgroundColor: "#1d4ed8" }} />
+              <div
+                style={{ display: "flex", flexDirection: "column", gap: "5px" }}
+              >
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "10px" }}
+                >
+                  <span
+                    style={{
+                      width: "100px",
+                      fontWeight: "bold",
+                      fontSize: "10pt",
+                    }}
+                  >
+                    Total Energy:
+                  </span>
+                  <div
+                    style={{
+                      flexGrow: 1,
+                      backgroundColor: "#e0f2ff",
+                      height: "18px",
+                      borderRadius: "4px",
+                      overflow: "hidden",
+                      minWidth: "100px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        height: "100%",
+                        width: `${Math.min(
+                          (result.total_energy_month_kwh / 3000) * 100,
+                          100
+                        )}%`,
+                        backgroundColor: "#1d4ed8",
+                      }}
+                    />
                   </div>
-                  <span style={{ width: "80px", textAlign: "right", fontWeight: "bold", fontSize: "10pt" }}>{result.total_energy_month_kwh} kWh</span>
+                  <span
+                    style={{
+                      width: "80px",
+                      textAlign: "right",
+                      fontWeight: "bold",
+                      fontSize: "10pt",
+                    }}
+                  >
+                    {result.total_energy_month_kwh} kWh
+                  </span>
                 </div>
               </div>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <span style={{ width: "100px", fontWeight: "bold", fontSize: "10pt" }}>Monthly EUI:</span>
-                  <div style={{ flexGrow: 1, backgroundColor: "#e9f8e9", height: "18px", borderRadius: "4px", overflow: "hidden", minWidth: "100px" }}>
-                    <div style={{ height: "100%", width: `${Math.min(result.eui_month_kwh_m2 / 40 * 100, 100)}%`, backgroundColor: "#15803d" }} />
+              <div
+                style={{ display: "flex", flexDirection: "column", gap: "5px" }}
+              >
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "10px" }}
+                >
+                  <span
+                    style={{
+                      width: "100px",
+                      fontWeight: "bold",
+                      fontSize: "10pt",
+                    }}
+                  >
+                    Monthly EUI:
+                  </span>
+                  <div
+                    style={{
+                      flexGrow: 1,
+                      backgroundColor: "#e9f8e9",
+                      height: "18px",
+                      borderRadius: "4px",
+                      overflow: "hidden",
+                      minWidth: "100px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        height: "100%",
+                        width: `${Math.min(
+                          (result.eui_month_kwh_m2 / 40) * 100,
+                          100
+                        )}%`,
+                        backgroundColor: "#15803d",
+                      }}
+                    />
                   </div>
-                  <span style={{ width: "80px", textAlign: "right", fontWeight: "bold", fontSize: "10pt" }}>{result.eui_month_kwh_m2} kWh/m²</span>
+                  <span
+                    style={{
+                      width: "80px",
+                      textAlign: "right",
+                      fontWeight: "bold",
+                      fontSize: "10pt",
+                    }}
+                  >
+                    {result.eui_month_kwh_m2} kWh/m²
+                  </span>
                 </div>
               </div>
             </div>
 
             <div className="mt-4">
-              <h3 className="font-semibold text-base text-gray-700 mb-2" style={{ fontSize: "12pt" }}>Impacting Factors</h3>
+              <h3
+                className="font-semibold text-base text-gray-700 mb-2"
+                style={{ fontSize: "12pt" }}
+              >
+                Impacting Factors
+              </h3>
               <ul style={{ listStyle: "none", padding: 0 }}>
-                {result.impacting_factors?.length ? result.impacting_factors.map((f, i) => (
-                  <li key={i} style={{ display: "flex", alignItems: "center", marginBottom: "4px", fontSize: "10pt" }}>
-                    <span style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#10b981", marginRight: "6px" }}></span>
-                    {f}
-                  </li>
-                )) : <li style={{ fontSize: "10pt" }}>No major issues found.</li>}
+                {result.impacting_factors?.length ? (
+                  result.impacting_factors.map((f, i) => (
+                    <li
+                      key={i}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginBottom: "4px",
+                        fontSize: "10pt",
+                      }}
+                    >
+                      <span
+                        style={{
+                          width: "6px",
+                          height: "6px",
+                          borderRadius: "50%",
+                          backgroundColor: "#10b981",
+                          marginRight: "6px",
+                        }}
+                      ></span>
+                      {f}
+                    </li>
+                  ))
+                ) : (
+                  <li style={{ fontSize: "10pt" }}>No major issues found.</li>
+                )}
               </ul>
             </div>
 
             <div className="mt-4">
-              <h3 className="font-semibold text-base text-gray-700 mb-2" style={{ fontSize: "12pt" }}>Recommendations</h3>
+              <h3
+                className="font-semibold text-base text-gray-700 mb-2"
+                style={{ fontSize: "12pt" }}
+              >
+                Recommendations
+              </h3>
               <ul style={{ listStyle: "none", padding: 0 }}>
-                {result.recommendations?.length ? result.recommendations.map((r, i) => (
-                  <li key={i} style={{ display: "flex", alignItems: "flex-start", marginBottom: "4px", fontSize: "10pt" }}>
-                    <span style={{ color: "#3b82f6", fontSize: "1em", marginRight: "6px" }}>💡</span>
-                    {r}
+                {result.recommendations?.length ? (
+                  result.recommendations.map((r, i) => (
+                    <li
+                      key={i}
+                      style={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        marginBottom: "4px",
+                        fontSize: "10pt",
+                      }}
+                    >
+                      <span
+                        style={{
+                          color: "#3b82f6",
+                          fontSize: "1em",
+                          marginRight: "6px",
+                        }}
+                      >
+                        💡
+                      </span>
+                      {r}
+                    </li>
+                  ))
+                ) : (
+                  <li style={{ fontSize: "10pt" }}>
+                    No improvements recommended.
                   </li>
-                )) : <li style={{ fontSize: "10pt" }}>No improvements recommended.</li>}
+                )}
               </ul>
             </div>
           </div>
         )}
 
-        <div className="text-center text-xs text-gray-500 mt-6 pt-3 border-t" style={{ fontSize: "9pt" }}>
-          Report Generated: {new Date().toLocaleDateString()} at {new Date().toLocaleTimeString()}
+        <div
+          className="text-center text-xs text-gray-500 mt-6 pt-3 border-t"
+          style={{ fontSize: "9pt" }}
+        >
+          Report Generated: {new Date().toLocaleDateString()} at{" "}
+          {new Date().toLocaleTimeString()}
         </div>
       </div>
     );
@@ -635,7 +917,14 @@ export default function PredictPage() {
       // If numeric field, validate and format
       if (key !== "Building_Type") {
         // Empty or intermediate -> set to min or 0
-        if (proposed === "" || proposed === null || proposed === undefined || proposed === "-" || proposed === "." || proposed === "-.") {
+        if (
+          proposed === "" ||
+          proposed === null ||
+          proposed === undefined ||
+          proposed === "-" ||
+          proposed === "." ||
+          proposed === "-."
+        ) {
           if (ranges && ranges[key]) {
             setForm((prev) => ({ ...prev, [key]: fmt2(ranges[key][0]) }));
           } else {
@@ -644,16 +933,25 @@ export default function PredictPage() {
         } else {
           const num = Number(proposed);
           if (isNaN(num)) {
-            if (ranges && ranges[key]) setForm((prev) => ({ ...prev, [key]: fmt2(ranges[key][0]) }));
+            if (ranges && ranges[key])
+              setForm((prev) => ({ ...prev, [key]: fmt2(ranges[key][0]) }));
             else setForm((prev) => ({ ...prev, [key]: "0.00" }));
           } else {
             if (ranges && ranges[key]) {
               const [min, max] = ranges[key];
               if (num < min || num > max) {
-                alert(`Value for ${key.replace(/_/g, " ")} must be between ${min} and ${max}.`);
+                alert(
+                  `Value for ${key.replace(
+                    /_/g,
+                    " "
+                  )} must be between ${min} and ${max}.`
+                );
                 return;
               }
-              setForm((prev) => ({ ...prev, [key]: fmt2(num < min ? min : num > max ? max : num) }));
+              setForm((prev) => ({
+                ...prev,
+                [key]: fmt2(num < min ? min : num > max ? max : num),
+              }));
             } else {
               setForm((prev) => ({ ...prev, [key]: fmt2(num) }));
             }
@@ -692,94 +990,140 @@ export default function PredictPage() {
 
     return (
       <div className="bg-white p-6 rounded-lg shadow">
-        <h3 className="text-xl font-bold mb-4">Confirm values before predicting</h3>
+        <h3 className="text-xl font-bold mb-4">
+          Confirm values before predicting
+        </h3>
         <div className="overflow-x-auto">
-        <table className="w-full border-collapse min-w-max">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border px-3 py-2 text-left" style={{ width: '40%' }}>Field</th>
-              <th className="border px-3 py-2 text-left" style={{ width: '40%' }}>Value</th>
-              <th className="border px-3 py-2 text-center" style={{ width: '20%' }}>Actions</th>
-            </tr>
-          </thead>
+          <table className="w-full border-collapse min-w-max">
+            <thead>
+              <tr className="bg-gray-100">
+                <th
+                  className="border px-3 py-2 text-left"
+                  style={{ width: "40%" }}
+                >
+                  Field
+                </th>
+                <th
+                  className="border px-3 py-2 text-left"
+                  style={{ width: "40%" }}
+                >
+                  Value
+                </th>
+                <th
+                  className="border px-3 py-2 text-center"
+                  style={{ width: "20%" }}
+                >
+                  Actions
+                </th>
+              </tr>
+            </thead>
 
-          <tbody>
-            {Object.keys(form).map((key) => {
-              const unit = getUnit(key);
-              const displayLabel = key === "Domestic_Hot_Water_Usage" ? "Daily Hot Water Usage" : key.replace(/_/g, " "); // <-- **THE CHANGE IS HERE**
-              return (
-                <tr key={key}>
-                  <td className="border px-3 py-2 capitalize">
-                    {displayLabel}
-                    {unit && <span className="text-gray-500"> ({unit})</span>}
-                  </td>
+            <tbody>
+              {Object.keys(form).map((key) => {
+                const unit = getUnit(key);
+                const displayLabel =
+                  key === "Domestic_Hot_Water_Usage"
+                    ? "Daily Hot Water Usage"
+                    : key.replace(/_/g, " "); // <-- **THE CHANGE IS HERE**
+                return (
+                  <tr key={key}>
+                    <td className="border px-3 py-2 capitalize">
+                      {displayLabel}
+                      {unit && <span className="text-gray-500"> ({unit})</span>}
+                    </td>
 
-                  <td className="border px-3 py-2">
-                    {editValues[key] !== undefined ? (
-                      key === "Building_Type" ? (
-                        <select
-                          value={editValues[key]}
-                          onChange={(e) => setEditValues((prev) => ({ ...prev, [key]: e.target.value }))}
-                          className="border px-2 py-1 rounded w-full"
-                        >
-                          <option value="">Select building type</option>
-                          {buildingTypes.map((t, i) => (
-                            <option key={i} value={t}>
-                              {t}
-                            </option>
-                          ))}
-                        </select>
-                      ) : (
-                        <div>
-                          <input
-                            type="text"
-                            step="0.01"
+                    <td className="border px-3 py-2">
+                      {editValues[key] !== undefined ? (
+                        key === "Building_Type" ? (
+                          <select
                             value={editValues[key]}
-                            onChange={(e) => setEditValues((prev) => ({ ...prev, [key]: e.target.value }))}
+                            onChange={(e) =>
+                              setEditValues((prev) => ({
+                                ...prev,
+                                [key]: e.target.value,
+                              }))
+                            }
                             className="border px-2 py-1 rounded w-full"
-                          />
-                          {ranges && ranges[key] && (
-                            <div className="text-xs text-gray-500 mt-1">
-                              Range: {ranges[key][0]} — {ranges[key][1]} {unit && unit}
-                            </div>
-                          )}
-                        </div>
-                      )
-                    ) : (
-                      <span>
-                        {key === "Building_Type" ? String(form[key]) : `${String(form[key])}${unit ? " " + unit : ""}`}
-                      </span>
-                    )}
-                  </td>
+                          >
+                            <option value="">Select building type</option>
+                            {buildingTypes.map((t, i) => (
+                              <option key={i} value={t}>
+                                {t}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          <div>
+                            <input
+                              type="text"
+                              step="0.01"
+                              value={editValues[key]}
+                              onChange={(e) =>
+                                setEditValues((prev) => ({
+                                  ...prev,
+                                  [key]: e.target.value,
+                                }))
+                              }
+                              className="border px-2 py-1 rounded w-full"
+                            />
+                            {ranges && ranges[key] && (
+                              <div className="text-xs text-gray-500 mt-1">
+                                Range: {ranges[key][0]} — {ranges[key][1]}{" "}
+                                {unit && unit}
+                              </div>
+                            )}
+                          </div>
+                        )
+                      ) : (
+                        <span>
+                          {key === "Building_Type"
+                            ? String(form[key])
+                            : `${String(form[key])}${unit ? " " + unit : ""}`}
+                        </span>
+                      )}
+                    </td>
 
-                  <td className="border px-3 py-2 text-center">
-                    {editValues[key] !== undefined ? (
-                      <div className="flex justify-center gap-2">
-                        <button onClick={() => handleSave(key)} className="px-3 py-1 bg-green-600 text-white rounded">
-                          Save
+                    <td className="border px-3 py-2 text-center">
+                      {editValues[key] !== undefined ? (
+                        <div className="flex justify-center gap-2">
+                          <button
+                            onClick={() => handleSave(key)}
+                            className="px-3 py-1 bg-green-600 text-white rounded"
+                          >
+                            Save
+                          </button>
+                          <button
+                            onClick={() => handleUndo(key)}
+                            className="px-3 py-1 bg-yellow-500 text-white rounded"
+                          >
+                            Undo
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => handleEdit(key)}
+                          className="px-3 py-1 bg-blue-600 text-white rounded"
+                        >
+                          Edit
                         </button>
-                        <button onClick={() => handleUndo(key)} className="px-3 py-1 bg-yellow-500 text-white rounded">
-                          Undo
-                        </button>
-                      </div>
-                    ) : (
-                      <button onClick={() => handleEdit(key)} className="px-3 py-1 bg-blue-600 text-white rounded">
-                        Edit
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
         <div className="flex gap-3 mt-6">
           <button onClick={goBack} className="px-4 py-2 border rounded">
             Back
           </button>
 
-          <button onClick={confirmAndPredict} className="bg-blue-600 text-white px-4 py-2 rounded" disabled={loading}>
+          <button
+            onClick={confirmAndPredict}
+            className="bg-blue-600 text-white px-4 py-2 rounded"
+            disabled={loading}
+          >
             {loading ? "Predicting..." : "Confirm & Predict"}
           </button>
         </div>
@@ -792,20 +1136,27 @@ export default function PredictPage() {
   // Split-screen layout: left = form, right = <PredictHeroFull /> (always visible per user request)
   return (
     <div
-  ref={formRef}
-  className="min-h-screen bg-[#fcf5ee] flex justify-center items-start px-4 pt-28 pb-10"
->
-
+      ref={formRef}
+      className="min-h-screen bg-[#fcf5ee] flex justify-center items-start px-4 pt-28 pb-10"
+    >
       <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
         {/* LEFT: Form / Content */}
         <div className="w-full my-auto">
           <div className="bg-blue-50 p-6 rounded-lg shadow w-full">
-            <h1 className="text-2xl font-bold mb-4 text-center">Energy Efficiency — Predict</h1>
+            <h1 className="text-2xl font-bold mb-4 text-center">
+              Energy Efficiency — Predict
+            </h1>
 
             {step === 0 && (
               <div className="text-center">
-                <p className="mb-6">Click Start to start entering building information (defaults prefilled).</p>
-                <button onClick={startFlow} className="bg-blue-600 text-white px-6 py-3 rounded">
+                <p className="mb-6">
+                  Click Start to start entering building information (defaults
+                  prefilled).
+                </p>
+                <button
+                  onClick={startFlow}
+                  className="bg-blue-600 text-white px-6 py-3 rounded"
+                >
                   Start
                 </button>
               </div>
@@ -844,10 +1195,18 @@ export default function PredictPage() {
                   )}
                 </div>
                 <div className="flex gap-3 mt-3">
-                  <button type="button" onClick={() => setStep(0)} className="px-4 py-2 rounded border">
+                  <button
+                    type="button"
+                    onClick={() => setStep(0)}
+                    className="px-4 py-2 rounded border"
+                  >
                     Cancel
                   </button>
-                  <button type="button" onClick={goNext} className="bg-green-600 text-white px-4 py-2 rounded">
+                  <button
+                    type="button"
+                    onClick={goNext}
+                    className="bg-green-600 text-white px-4 py-2 rounded"
+                  >
                     Next
                   </button>
                 </div>
@@ -870,12 +1229,22 @@ export default function PredictPage() {
                   animate-fadeIn
                 "
               >
-                <h3 className="text-xl font-semibold mb-6 text-gray-800">Envelope Properties</h3>
+                <h3 className="text-xl font-semibold mb-6 text-gray-800">
+                  Envelope Properties
+                </h3>
 
-                <div className="space-y-5">{envelopeFields.map((f) => fieldRow(f.replace(/_/g, " "), f, 2, "text", "0.01"))}</div>
+                <div className="space-y-5">
+                  {envelopeFields.map((f) =>
+                    fieldRow(f.replace(/_/g, " "), f, 2, "text", "0.01")
+                  )}
+                </div>
 
                 <div className="flex gap-3 mt-8">
-                  <button type="button" onClick={goBack} className="px-5 py-2 rounded-lg border hover:bg-gray-100 transition">
+                  <button
+                    type="button"
+                    onClick={goBack}
+                    className="px-5 py-2 rounded-lg border hover:bg-gray-100 transition"
+                  >
                     Back
                   </button>
 
@@ -892,13 +1261,20 @@ export default function PredictPage() {
 
             {step === 3 && (
               <div className="mt-4">
-                <h3 className="text-lg font-semibold mb-3">Heat, Ventilation & AC</h3>
-                {hvacFields.map((f) => fieldRow(f.replace(/_/g, " "), f, 3, "text", "0.01"))}
+                <h3 className="text-lg font-semibold mb-3">
+                  Heat, Ventilation & AC
+                </h3>
+                {hvacFields.map((f) =>
+                  fieldRow(f.replace(/_/g, " "), f, 3, "text", "0.01")
+                )}
                 <div className="flex gap-3 mt-4">
                   <button onClick={goBack} className="px-4 py-2 rounded border">
                     Back
                   </button>
-                  <button onClick={goNext} className="bg-green-600 text-white px-4 py-2 rounded">
+                  <button
+                    onClick={goNext}
+                    className="bg-green-600 text-white px-4 py-2 rounded"
+                  >
                     Next
                   </button>
                 </div>
@@ -919,7 +1295,10 @@ export default function PredictPage() {
                   <button onClick={goBack} className="px-4 py-2 rounded border">
                     Back
                   </button>
-                  <button onClick={goNext} className="bg-green-600 text-white px-4 py-2 rounded">
+                  <button
+                    onClick={goNext}
+                    className="bg-green-600 text-white px-4 py-2 rounded"
+                  >
                     Next
                   </button>
                 </div>
@@ -928,13 +1307,20 @@ export default function PredictPage() {
 
             {step === 5 && (
               <div className="mt-4">
-                <h3 className="text-lg font-semibold mb-3">Building Geometry</h3>
-                {geometryFields.map((f) => fieldRow(f.replace(/_/g, " "), f, 5, "text", "0.01"))}
+                <h3 className="text-lg font-semibold mb-3">
+                  Building Geometry
+                </h3>
+                {geometryFields.map((f) =>
+                  fieldRow(f.replace(/_/g, " "), f, 5, "text", "0.01")
+                )}
                 <div className="flex gap-3 mt-4">
                   <button onClick={goBack} className="px-4 py-2 rounded border">
                     Back
                   </button>
-                  <button onClick={() => setStep(6)} className="bg-blue-600 text-white px-4 py-2 rounded">
+                  <button
+                    onClick={() => setStep(6)}
+                    className="bg-blue-600 text-white px-4 py-2 rounded"
+                  >
                     Review & Confirm
                   </button>
                 </div>
@@ -946,9 +1332,16 @@ export default function PredictPage() {
             {/* Step 7: Results */}
             {step === 7 && result && (
               <div className="mt-6 p-6 bg-white rounded-lg shadow space-y-6">
-
                 {/* HIDE THE PRINTABLE VERSION from normal view, but keep it in the DOM */}
-                <div style={{ position: 'absolute', left: '-9999px', top: '0', width: '100%', height: '100%' }}>
+                <div
+                  style={{
+                    position: "absolute",
+                    left: "-9999px",
+                    top: "0",
+                    width: "100%",
+                    height: "100%",
+                  }}
+                >
                   <PrintableReport />
                 </div>
 
@@ -963,18 +1356,24 @@ export default function PredictPage() {
                 </h2>
 
                 <div className="flex items-center gap-3 mt-2">
-                  <p className={`font-bold px-3 py-1 rounded inline-block ${
-                    result.performance_category === "Excellent" ? "bg-green-100 text-green-800" :
-                      result.performance_category === "Moderate" ? "bg-yellow-100 text-yellow-800" :
-                        "bg-red-100 text-red-800"
-                    }`}>
+                  <p
+                    className={`font-bold px-3 py-1 rounded inline-block ${
+                      result.performance_category === "Excellent"
+                        ? "bg-green-100 text-green-800"
+                        : result.performance_category === "Moderate"
+                        ? "bg-yellow-100 text-yellow-800"
+                        : "bg-red-100 text-red-800"
+                    }`}
+                  >
                     {result.performance_category}
                   </p>
                   <img
                     src={
-                      result.performance_category === "Excellent" ? "/assets/excellent.gif" :
-                        result.performance_category === "Moderate" ? "/assets/moderate.gif" :
-                          "/assets/poor.gif"
+                      result.performance_category === "Excellent"
+                        ? "/assets/excellent.gif"
+                        : result.performance_category === "Moderate"
+                        ? "/assets/moderate.gif"
+                        : "/assets/poor.gif"
                     }
                     alt="Performance Icon"
                     className="w-20 h-30"
@@ -983,87 +1382,140 @@ export default function PredictPage() {
 
                 {/* Energy Metrics */}
                 <div className="mt-4 space-y-3">
-                  <h3 className="font-semibold text-gray-700">Energy Metrics</h3>
+                  <h3 className="font-semibold text-gray-700">
+                    Energy Metrics
+                  </h3>
 
                   {["Total Energy", "Monthly EUI"].map((label, idx) => {
-                    const value = label === "Total Energy" ? result.total_energy_month_kwh : result.eui_month_kwh_m2;
+                    const value =
+                      label === "Total Energy"
+                        ? result.total_energy_month_kwh
+                        : result.eui_month_kwh_m2;
                     const color = label === "Total Energy" ? "blue" : "green";
                     const max = label === "Total Energy" ? 3000 : 50;
                     const colorMap = {
-                      blue: { bg: '#bfdbfe', progress: '#2563eb' },
-                      green: { bg: '#dcfce7', progress: '#16a34a' }
+                      blue: { bg: "#bfdbfe", progress: "#2563eb" },
+                      green: { bg: "#dcfce7", progress: "#16a34a" },
                     };
                     const colorConfig = colorMap[color];
 
                     return (
-                      <div key={idx} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                      <div
+                        key={idx}
+                        className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3"
+                      >
                         <span className="w-32">{label}:</span>
 
-                        <div className={`h-4 rounded flex-1 overflow-hidden`} style={{ backgroundColor: colorConfig.bg }}>
+                        <div
+                          className={`h-4 rounded flex-1 overflow-hidden`}
+                          style={{ backgroundColor: colorConfig.bg }}
+                        >
                           <div
                             className={`h-4 rounded transition-all duration-500`}
                             style={{
-                              width: `${Math.min(value / max * 100, 100)}%`,
-                              backgroundColor: colorConfig.progress
+                              width: `${Math.min((value / max) * 100, 100)}%`,
+                              backgroundColor: colorConfig.progress,
                             }}
                           />
                         </div>
-                        <span>{value}{label === "Total Energy" ? " kWh" : " kWh/m²"}</span>
+                        <span>
+                          {value}
+                          {label === "Total Energy" ? " kWh" : " kWh/m²"}
+                        </span>
                       </div>
-                    )
+                    );
                   })}
                 </div>
 
                 {/* Impacting Factors */}
                 <div className="mt-4">
-                  <h3 className="font-semibold text-gray-700 mb-2">Impacting Factors</h3>
+                  <h3 className="font-semibold text-gray-700 mb-2">
+                    Impacting Factors
+                  </h3>
                   <div className="flex flex-wrap gap-3">
-                    {result.impacting_factors?.length ? result.impacting_factors.map((f, i) => {
-                      const impactColor = f.toLowerCase().includes("high") ? "bg-red-500" :
-                        f.toLowerCase().includes("medium") ? "bg-yellow-400" :
-                          "bg-green-500";
-                      return (
-                        <div key={i} className="flex items-center gap-2 p-2 border rounded hover:shadow-lg transition cursor-pointer">
-                          <span className={`w-3 h-3 rounded-full ${impactColor}`} />
-                          <span>{f}</span>
-                        </div>
-                      );
-                    }) : <div className="text-green-700">No major issues found — building appears efficient.</div>}
+                    {result.impacting_factors?.length ? (
+                      result.impacting_factors.map((f, i) => {
+                        const impactColor = f.toLowerCase().includes("high")
+                          ? "bg-red-500"
+                          : f.toLowerCase().includes("medium")
+                          ? "bg-yellow-400"
+                          : "bg-green-500";
+                        return (
+                          <div
+                            key={i}
+                            className="flex items-center gap-2 p-2 border rounded hover:shadow-lg transition cursor-pointer"
+                          >
+                            <span
+                              className={`w-3 h-3 rounded-full ${impactColor}`}
+                            />
+                            <span>{f}</span>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div className="text-green-700">
+                        No major issues found — building appears efficient.
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 {/* Recommendations */}
                 <div className="mt-4">
-                  <h3 className="font-semibold text-gray-700 mb-2">Recommendations</h3>
+                  <h3 className="font-semibold text-gray-700 mb-2">
+                    Recommendations
+                  </h3>
                   <div className="flex flex-wrap gap-3">
-                    {result.recommendations?.length ? result.recommendations.map((r, i) => (
-                      <div key={i} className="flex items-center gap-2 p-2 border rounded hover:bg-blue-50 transition cursor-pointer">
-                        <span className="text-blue-500">💡</span>
-                        <span>{r}</span>
+                    {result.recommendations?.length ? (
+                      result.recommendations.map((r, i) => (
+                        <div
+                          key={i}
+                          className="flex items-center gap-2 p-2 border rounded hover:bg-blue-50 transition cursor-pointer"
+                        >
+                          <span className="text-blue-500">💡</span>
+                          <span>{r}</span>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-green-700">
+                        No improvements recommended. Excellent performance.
                       </div>
-                    )) : <div className="text-green-700">No improvements recommended. Excellent performance.</div>}
+                    )}
                   </div>
                 </div>
 
                 {/* Action Buttons */}
                 <div className="mt-6 flex flex-wrap gap-3">
-                  <button onClick={handleDownload} className="px-4 py-2 border rounded bg-blue-600 text-white hover:bg-blue-700 transition flex items-center gap-1">
+                  <button
+                    onClick={handleDownload}
+                    className="px-4 py-2 border rounded bg-blue-600 text-white hover:bg-blue-700 transition flex items-center gap-1"
+                  >
                     ⬇️ Download Report (PDF)
                   </button>
-                  <button onClick={onPredictAgainSame} className="px-4 py-2 border rounded bg-green-200 hover:bg-gray-100 transition flex items-center gap-1">
+                  <button
+                    onClick={onPredictAgainSame}
+                    className="px-4 py-2 border rounded bg-green-200 hover:bg-gray-100 transition flex items-center gap-1"
+                  >
                     🔄 Predict Again (Same)
                   </button>
-                  <button onClick={onPredictAgainDifferent} className="px-4 py-2 border rounded hover:bg-gray-100 transition flex items-center gap-1">
+                  <button
+                    onClick={onPredictAgainDifferent}
+                    className="px-4 py-2 border rounded hover:bg-gray-100 transition flex items-center gap-1"
+                  >
                     🔄 New
                   </button>
-                  <button onClick={onExit} className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition flex items-center gap-1">
+                  <button
+                    onClick={onExit}
+                    className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition flex items-center gap-1"
+                  >
                     ❌ Exit
                   </button>
                 </div>
-
               </div>
             )}
-            {sessionEnded && <div className="mt-4 text-gray-600">Session ended.</div>}
+            {sessionEnded && (
+              <div className="mt-4 text-gray-600">Session ended.</div>
+            )}
           </div>
         </div>
 
